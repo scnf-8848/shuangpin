@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>双拼练习软件</string>
+   <string>双拼练习</string>
   </property>
   <property name="windowIcon">
    <iconset resource="app_icon.qrc">
@@ -67,7 +67,7 @@
          </size>
         </property>
         <property name="title">
-         <string>GroupBox</string>
+         <string>练习项目</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>

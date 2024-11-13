@@ -1,6 +1,5 @@
-from os import read
-from pypinyin import pinyin, lazy_pinyin, Style
-from pypinyin.contrib.tone_convert import to_normal, to_tone, to_initials, to_finals
+from pypinyin import pinyin
+from pypinyin.contrib.tone_convert import to_initials, to_finals
 
 
 # 读取双拼映射规则

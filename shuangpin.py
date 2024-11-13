@@ -1,7 +1,7 @@
 import sys
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel
+from PySide6.QtWidgets import QMainWindow, QApplication
 from Ui_Gui import Ui_MainWindow
-import random
+from random import randint
 from config_shuangpin import load_data, trans_shuangpinkey
 
 
@@ -53,7 +53,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.max_word_count <= 0:
             return
         # 随机选词
-        i = random.randint(0,self.max_word_count-1)
+        i = randint(0,self.max_word_count-1)
         self.last_index = i
         self.showed_word_and_key = [self.selected_word_and_key[0][i],self.selected_word_and_key[1][i]]                                                                                                                                                                                                                                                                                                                                                                                      
         self.lineEdit.setText("")
@@ -66,11 +66,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 回答正确
         if self.lineEdit.text() == self.showed_word_and_key[1]:
             self.lineEdit.setText("")
-            i = random.randint(0,self.max_word_count-1)
+            i = randint(0,self.max_word_count-1)
             # 避免与上次重复
             if self.max_word_count != 1:
                 while i == self.last_index:
-                    i = random.randint(0,self.max_word_count-1)
+                    i = randint(0,self.max_word_count-1)
             self.last_index = i
             self.showed_word_and_key = [self.selected_word_and_key[0][i],self.selected_word_and_key[1][i]]  
 

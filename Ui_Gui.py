@@ -290,8 +290,8 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"\u53cc\u62fc\u7ec3\u4e60\u8f6f\u4ef6", None))
-        self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"GroupBox", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"\u53cc\u62fc\u7ec3\u4e60", None))
+        self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u7ec3\u4e60\u9879\u76ee", None))
         self.checkBox_00.setText(QCoreApplication.translate("MainWindow", u"\u96f6\uff1aZh/Ch/Sh", None))
         self.checkBox_01.setText(QCoreApplication.translate("MainWindow", u"\u4e00\uff1aan/ian/ao", None))
         self.checkBox_02.setText(QCoreApplication.translate("MainWindow", u"\u4e8c\uff1aing/ang/ui", None))
