@@ -68,8 +68,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.lineEdit.setText("")
             i = random.randint(0,self.max_word_count-1)
             # 避免与上次重复
-            while i == self.last_index:
-                i = random.randint(0,self.max_word_count-1)
+            if self.max_word_count != 1:
+                while i == self.last_index:
+                    i = random.randint(0,self.max_word_count-1)
             self.last_index = i
             self.showed_word_and_key = [self.selected_word_and_key[0][i],self.selected_word_and_key[1][i]]  
 
