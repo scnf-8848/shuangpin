@@ -10,7 +10,7 @@
 
 有一定熟练度的人可以选择关闭按键提示，
 
-![1731515108363](image/README/mainwindow.png)
+![](image/README/mainwindow.png)
 
 ## 说明
 1. 项目一到九按照常用3500字中韵母的频率排序，可以优先练习高频韵母
