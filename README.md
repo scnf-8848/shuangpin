@@ -26,3 +26,6 @@
    
     这样同时要求sh->u ou->z zh->v ang->h多个映射的难词
 5. 可以在"/词库"文件夹里修改练习词库，10.txt可自定义练习的词库，支持字、词、成语、句子，但不建议包含标点符号
+
+## 引用
+* [mozillazg/python-pinyin](https://github.com/mozillazg/python-pinyin)
