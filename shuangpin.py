@@ -11,8 +11,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         
         self.setupUi(self)
-        self.Button_config.clicked.connect(self.selected_part)
-        self.Button_start.clicked.connect(self.start)
+        self.Button_set.clicked.connect(self.config_data)
         self.lineEdit.textEdited.connect(self.check_input)
         self.checkBox_mode.checkStateChanged.connect(self.change_show_mode)
         self.selected_range = [] # 选择的练习项目
@@ -23,8 +22,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.last_index = 0 # 上一个词语的序号
 
     
-    # 读取勾选项目
-    def selected_part(self):
+    # 应用勾选项目
+    def config_data(self):
         checkboxes = [self.checkBox_00,
                       self.checkBox_01,
                       self.checkBox_02,
@@ -36,16 +35,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                       self.checkBox_08,
                       self.checkBox_09,
                       self.checkBox_10]
-        selected_range = []
+        self.selected_range = []
         for i,cb in enumerate(checkboxes):
             if cb.isChecked():
-                selected_range.append(i)
+                self.selected_range.append(i)
         # 将所选项目的数据从词库中 提取到 选择词库.txt 并转化为对应双拼按键
-        trans_shuangpinkey(selected_range)
-
-
-
-    def start(self):
+        trans_shuangpinkey(self.selected_range)
+        
         # 导入 选择词库和按键
         self.selected_word_and_key = load_data() 
         self.max_word_count = len(self.selected_word_and_key[0])
@@ -59,6 +55,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lineEdit.setText("")
         self.check_input()
         self.lineEdit.setFocus()    
+
+
 
 
     def check_input(self):
@@ -111,7 +109,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.show_mode = 1
         else:
             self.show_mode = 0
-        if self.max_word_count != 0:
+        if self.max_word_count > 0:
             self.check_input()
             self.lineEdit.setFocus()    
             
