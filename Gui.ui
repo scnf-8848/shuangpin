@@ -304,8 +304,14 @@
               <pointsize>11</pointsize>
              </font>
             </property>
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::LeftToRight</enum>
+            </property>
             <property name="text">
              <string>配置</string>
+            </property>
+            <property name="autoRepeatDelay">
+             <number>300</number>
             </property>
            </widget>
           </item>
