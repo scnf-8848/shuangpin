@@ -13,7 +13,7 @@ def read_rule():
 
 
 # 汉字转拼音 再转双拼按键
-def hanzi_2_shuangpin(line,rule):
+def hanzi_2_shuangpin(line,rule:dict):
     pykey = ''
     for word_pinyin in pinyin(line,strict=False):
         i = to_initials(word_pinyin[0],strict=False) # 声母
@@ -24,6 +24,7 @@ def hanzi_2_shuangpin(line,rule):
 #       双字母韵母，零声母 + 韵母末字母：爱=ai 恩=en 欧=ou
 #       三字母韵母，零声母 + 韵母所在键：昂=ah
 #       简单说：双字母音节保持全拼方式，一三字母音节为首字母加韵母所在键
+
         if i == '':
             if f in ['a','o','e']:
                 i = f[0]
@@ -34,6 +35,7 @@ def hanzi_2_shuangpin(line,rule):
             i = rule.get(i,i)
             f = rule.get(f,f)
         pykey += i + f
+
     return pykey
 
 
@@ -42,7 +44,7 @@ def hanzi_2_shuangpin(line,rule):
 def trans_shuangpinkey(selected_range:list):
     rule = read_rule()
     selected_word = []
-    selected_pykey=[]
+    selected_pykey = []
 
     for i in range(0,11):
         if i in selected_range:
@@ -51,7 +53,6 @@ def trans_shuangpinkey(selected_range:list):
                 for line in lines:
                     selected_word.append(line.strip())
                     selected_pykey.append(hanzi_2_shuangpin(line.strip(),rule))
-
 
     with open('选择词库.txt', 'w',encoding='utf - 8') as output_file:
         for line in selected_word:
@@ -63,7 +64,7 @@ def trans_shuangpinkey(selected_range:list):
 
 
 
-# 导入 选择词库和按键
+# 导入选择词库和按键
 def load_data():
     word = []
     key = []
