@@ -21,7 +21,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.show_mode = 1 # 1-显示按键提示 0-不显示按键提示
         self.last_index = 0 # 上一个词语的序号
 
-    
+
     # 应用勾选项目
     def config_data(self):
         checkboxes = [self.checkBox_00,
@@ -55,8 +55,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lineEdit.setText("")
         self.check_input()
         self.lineEdit.setFocus()    
-
-
 
 
     def check_input(self):
@@ -113,7 +111,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.check_input()
             self.lineEdit.setFocus()    
             
-
 
 
 if __name__ == '__main__':
