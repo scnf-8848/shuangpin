@@ -165,6 +165,8 @@ class Ui_MainWindow(object):
         sizePolicy2.setHeightForWidth(self.Button_set.sizePolicy().hasHeightForWidth())
         self.Button_set.setSizePolicy(sizePolicy2)
         self.Button_set.setFont(font)
+        self.Button_set.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.Button_set.setAutoRepeatDelay(300)
 
         self.verticalLayout_2.addWidget(self.Button_set)
 
