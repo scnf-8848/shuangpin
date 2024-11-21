@@ -102,7 +102,7 @@
             </font>
            </property>
            <property name="text">
-            <string>一：an/ian/ao</string>
+            <string>一：ian ing an</string>
            </property>
           </widget>
          </item>
@@ -120,7 +120,7 @@
             </font>
            </property>
            <property name="text">
-            <string>二：ing/ang/ui</string>
+            <string>二：ong ao ang</string>
            </property>
           </widget>
          </item>
@@ -138,7 +138,7 @@
             </font>
            </property>
            <property name="text">
-            <string>三：ai/eng/ong</string>
+            <string>三：eng ai ui</string>
            </property>
           </widget>
          </item>
@@ -156,7 +156,7 @@
             </font>
            </property>
            <property name="text">
-            <string>四：iao/uo/ou</string>
+            <string>四：en uo in</string>
            </property>
           </widget>
          </item>
@@ -174,7 +174,7 @@
             </font>
            </property>
            <property name="text">
-            <string>五：in/en/ie</string>
+            <string>五：iao ou iang</string>
            </property>
           </widget>
          </item>
@@ -192,7 +192,7 @@
             </font>
            </property>
            <property name="text">
-            <string>六：uan/iang/iu</string>
+            <string>六：uan iu ie</string>
            </property>
           </widget>
          </item>
@@ -210,7 +210,7 @@
             </font>
            </property>
            <property name="text">
-            <string>七：ei/un/ün/uang</string>
+            <string>七：ei ia üan</string>
            </property>
           </widget>
          </item>
@@ -228,7 +228,7 @@
             </font>
            </property>
            <property name="text">
-            <string>八：ia/üan/ue/üe</string>
+            <string>八：un/ün ue/üe uang</string>
            </property>
           </widget>
          </item>
@@ -246,7 +246,7 @@
             </font>
            </property>
            <property name="text">
-            <string>九：ua/iong/uai</string>
+            <string>九：ua uai iong</string>
            </property>
           </widget>
          </item>
