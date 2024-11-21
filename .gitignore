@@ -2,3 +2,7 @@ __pycache__
 app_icon.qrc
 app_icon_rc.py
 /icon
+dabao.py
+/build
+/dist
+shuangpin.spec
