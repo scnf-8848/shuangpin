@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小鹤双拼练习</title>
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* 防止iOS下的字体自动调整 */
+        html {
+            -webkit-text-size-adjust: 100%;
+            -moz-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+
+        /* 全局样式 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            padding: 20px;
+            padding-top: 5%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 容器样式 */
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        /* 头部样式 */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* 章节选择器样式 */
+        .chapter-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chapter-card {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chapter-card.empty {
+            visibility: hidden;
+            cursor: default;
+            pointer-events: none;
+            border: none;
+            background: transparent;
+        }
+
+        .chapter-card:hover:not(.empty) {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chapter-card.selected {
+            border-color: #38b2ac;
+            background-color: #f0fff4;
+            box-shadow: 0 5px 15px rgba(56, 178, 172, 0.2);
+        }
+
+        .start-practice-button {
+            display: block;
+            margin: 30px auto 0;
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #38b2ac;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .start-practice-button:hover {
+            background: #2c978f;
+            transform: translateY(-2px);
+        }
+
+        .start-practice-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 练习区域样式 */
+        .practice-area {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* 控制按钮样式 */
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .left-controls, .right-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            height: 40px;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .control-button:hover {
+            background: #764ba2;
+            transform: translateY(-1px);
+        }
+
+        .control-button.active {
+            background: #38b2ac;
+        }
+
+        /* 词汇显示样式 */
+        .word-display {
+            font-size: 64px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* 答案显示样式 */
+        .answer-display {
+            font-size: 24px;
+            color: #667eea;
+            text-align: center;
+            min-height: 30px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+            max-height: 200px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .answer-display.hidden {
+            max-height: 0;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            border: none;
+            pointer-events: none;
+        }
+
+        /* 输入框样式 */
+        .realtime-input {
+            font-size: 32px;
+            padding: 15px 30px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            width: 250px;
+            font-family: 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            text-transform: lowercase;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto 30px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .realtime-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .realtime-input.correct {
+            border-color: #4CAF50;
+            background-color: #f8fff8;
+        }
+
+        .realtime-input.incorrect {
+            border-color: #f44336;
+            background-color: #fff8f8;
+        }
+
+        /* 统计信息样式 */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 消息提示样式 */
+        .message {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 16px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* 键盘布局样式 */
+        .keyboard-layout {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 0;
+            margin-top: 10px;
+            display: block;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            opacity: 0;
+            border: 1px solid #e9ecef;
+            position: relative;
+            width: 100%;
+        }
+
+        .keyboard-layout.show {
+            max-height: 250px;
+            opacity: 1;
+            padding: 10px;
+            border-color: #e9ecef;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .keyboard-title {
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .keyboard-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1px;
+        }
+
+        /* 按键样式 */
+        .key {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            height: 50px;
+            width: 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .key .letter {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .key .mapping {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.1;
+        }
+
+        .key.empty {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            cursor: default;
+            min-width: 20px;
+        }
+        
+        /* 响应式设计 - 针对移动设备的优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-top: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 0;
+                border-radius: 15px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+            }
+            
+            .chapter-selector {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .chapter-card {
+                min-height: 80px;
+                padding: 15px;
+            }
+            
+            .chapter-title {
+                font-size: 16px;
+            }
+            
+            .chapter-desc {
+                font-size: 12px;
+            }
+            
+            .word-display {
+                font-size: 36px;
+                margin-bottom: 15px;
+            }
+            
+            .realtime-input {
+                width: 180px;
+                font-size: 22px;
+                padding: 12px 20px;
+            }
+            
+            .header-controls {
+                flex-direction: column;
+                gap: 15px;
+                padding: 0 10px;
+            }
+            
+            .left-controls, .right-controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .control-button {
+                padding: 8px 16px;
+                font-size: 13px;
+                min-width: 100px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .stat-item {
+                min-width: 100px;
+                padding: 10px;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+            
+            .keyboard-layout.show {
+                max-height: 200px;
+            }
+            
+            .key {
+                height: 40px;
+                width: 45px;
+            }
+            
+            .key .letter {
+                font-size: 14px;
+            }
+            
+            .key .mapping {
+                font-size: 9px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .word-display {
+                font-size: 30px;
+            }
+            
+            .answer-display {
+                font-size: 20px;
+                padding: 10px;
+            }
+            
+            .realtime-input {
+                width: 160px;
+                font-size: 20px;
+            }
+            
+            .keyboard-layout.show {
+                max-height: 180px;
+            }
+            
+            .key {
+                height: 35px;
+                width: 40px;
+                padding: 5px 2px;
+            }
+            
+            .key .letter {
+                font-size: 12px;
+            }
+            
+            .key .mapping {
+                font-size: 8px;
+            }
+        }
+        
+        /* 移动端触摸反馈优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .chapter-card:active:not(.empty) {
+                transform: scale(0.98);
+            }
+            
+            .control-button:active {
+                transform: scale(0.98);
+            }
+            
+            .realtime-input {
+                font-size: 24px;
+            }
+        }
+        
+        /* 防止iOS下的焦点高亮 */
+        *:focus {
+            outline: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">小鹤双拼练习</h1>
+            <p class="subtitle">by:scnf</p>
+        </div>
+
+        <div id="chapterSelector" class="chapter-selector">
+            <div class="chapter-card" data-chapter="0">
+                <div class="chapter-title">第0章</div>
+                <div class="chapter-desc">Zh、Ch、Sh</div>
+            </div>
+            <div class="chapter-card empty" data-chapter="-1"></div>
+            <div class="chapter-card empty" data-chapter="-2"></div>
+            <div class="chapter-card" data-chapter="1">
+                <div class="chapter-title">第1章</div>
+                <div class="chapter-desc">ian、ing、an</div>
+            </div>
+            <div class="chapter-card" data-chapter="2">
+                <div class="chapter-title">第2章</div>
+                <div class="chapter-desc">ong、ao、ang</div>
+            </div>
+            <div class="chapter-card" data-chapter="3">
+                <div class="chapter-title">第3章</div>
+                <div class="chapter-desc">eng、ai、ui</div>
+            </div>
+            <div class="chapter-card" data-chapter="4">
+                <div class="chapter-title">第4章</div>
+                <div class="chapter-desc">en、uo、in</div>
+            </div>
+            <div class="chapter-card" data-chapter="5">
+                <div class="chapter-title">第5章</div>
+                <div class="chapter-desc">iao、ou、iang</div>
+            </div>
+            <div class="chapter-card" data-chapter="6">
+                <div class="chapter-title">第6章</div>
+                <div class="chapter-desc">uan、iu、ie</div>
+            </div>
+            <div class="chapter-card" data-chapter="7">
+                <div class="chapter-title">第7章</div>
+                <div class="chapter-desc">ei、ia、üan</div>
+            </div>
+            <div class="chapter-card" data-chapter="8">
+                <div class="chapter-title">第8章</div>
+                <div class="chapter-desc">un/ün、ue/üe、uang</div>
+            </div>
+            <div class="chapter-card" data-chapter="9">
+                <div class="chapter-title">第9章</div>
+                <div class="chapter-desc">ua、uai、iong</div>
+            </div>
+            <button id="startPractice" class="start-practice-button" disabled>开始练习</button>
+        </div>
+
+        <div id="practiceArea" class="practice-area">
+            <div class="header-controls">
+                <div class="left-controls">
+                    <button class="control-button" id="backToChapters">返回章节</button>
+                </div>
+                <div class="right-controls">
+                    <button class="control-button" id="answerToggle">显示答案</button>
+                    <button class="control-button" id="keyboardToggle">按键图</button>
+                </div>
+            </div>
+
+            <div class="word-display" id="currentWord">选择章节开始练习</div>
+            
+            <div class="answer-display hidden" id="answerDisplay"></div>
+            
+            <input type="text" class="realtime-input" id="realtimeInput" maxlength="4" autocomplete="off">
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracy">100%</div>
+                    <div class="stat-label">正确率</div>
+                </div>
+            </div>
+
+            <div class="message" id="message" style="display: none;"></div>
+
+             <div class="keyboard-layout" id="keyboardLayout">
+                 <div class="keyboard-title">小鹤双拼键位图</div>
+                 <div class="keyboard-container">
+                     <div class="keyboard-row">
+                         <div class="key"><div class="letter">Q</div><div class="mapping">iu</div></div>
+                         <div class="key"><div class="letter">W</div><div class="mapping">ei</div></div>
+                         <div class="key"><div class="letter">E</div><div class="mapping">e</div></div>
+                         <div class="key"><div class="letter">R</div><div class="mapping">uan</div></div>
+                         <div class="key"><div class="letter">T</div><div class="mapping">ve/ue</div></div>
+                         <div class="key"><div class="letter">Y</div><div class="mapping">un</div></div>
+                         <div class="key"><div class="letter">U</div><div class="mapping">u/sh</div></div>
+                         <div class="key"><div class="letter">I</div><div class="mapping">i/ch</div></div>
+                         <div class="key"><div class="letter">O</div><div class="mapping">o/uo</div></div>
+                         <div class="key"><div class="letter">P</div><div class="mapping">un</div></div>
+                     </div>
+                     
+                     <div class="keyboard-row">
+                         <div class="key empty"></div>
+                         <div class="key"><div class="letter">A</div><div class="mapping">a</div></div>
+                         <div class="key"><div class="letter">S</div><div class="mapping">ong/iong</div></div>
+                         <div class="key"><div class="letter">D</div><div class="mapping">ai</div></div>
+                         <div class="key"><div class="letter">F</div><div class="mapping">en</div></div>
+                         <div class="key"><div class="letter">G</div><div class="mapping">eng</div></div>
+                         <div class="key"><div class="letter">H</div><div class="mapping">ang</div></div>
+                         <div class="key"><div class="letter">J</div><div class="mapping">an</div></div>
+                         <div class="key"><div class="letter">K</div><div class="mapping">ing</div></div>
+                         <div class="key"><div class="letter">L</div><div class="mapping">iang/uang</div></div>
+                         <div class="key empty"></div>
+                     </div>
+                     
+                     <div class="keyboard-row">
+                         <div class="key empty"></div>
+                         <div class="key"><div class="letter">Z</div><div class="mapping">ou</div></div>
+                         <div class="key"><div class="letter">X</div><div class="mapping">ie</div></div>
+                         <div class="key"><div class="letter">C</div><div class="mapping">ao</div></div>
+                         <div class="key"><div class="letter">V</div><div class="mapping">ui/zh</div></div>
+                         <div class="key"><div class="letter">B</div><div class="mapping">in</div></div>
+                         <div class="key"><div class="letter">N</div><div class="mapping">iao</div></div>
+                         <div class="key"><div class="letter">M</div><div class="mapping">ian</div></div>
+                         <div class="key empty"></div>
+                         <div class="key empty"></div>
+                     </div>
+                 </div>
+             </div>
+
+             </div>
+         </div>
+     </div>
+
+     <script>
+        const SHUANGPIN_DATA = {
+            0: {
+                "驻扎": "vuva",
+                "这个": "vege",
+                "打折": "dave",
+                "遮住": "vevu",
+                "记者": "jive",
+                "哲理": "veli",
+                "值得": "vide",
+                "预知": "yuvi",
+                "只是": "viui",
+                "指示": "viui",
+                "支付": "vifu",
+                "至于": "viyu",
+                "一直": "yivi",
+                "预制": "yuvi",
+                "智力": "vili",
+                "芝士": "viui",
+                "主席": "vuxi",
+                "竹子": "vuzi",
+                "珠子": "vuzi",
+                "祝贺": "vuhe",
+                "助理": "vuli",
+                "业主": "yevu",
+                "不差": "buia",
+                "普查": "puia",
+                "插入": "iaru",
+                "夜叉": "yeia",
+                "喝茶": "heia",
+                "汽车": "qiie",
+                "彻底": "iedi",
+                "撤去": "iequ",
+                "吃喝": "iihe",
+                "尺子": "iizi",
+                "扶持": "fuii",
+                "池子": "iizi",
+                "智齿": "viii",
+                "迟了": "iile",
+                "出去": "iuqu",
+                "处理": "iuli",
+                "厨具": "iuju",
+                "触摸": "iumo",
+                "除法": "iufa",
+                "傻子": "uazi",
+                "沙子": "uazi",
+                "鲨鱼": "uayu",
+                "大厦": "daua",
+                "设计": "ueji",
+                "射击": "ueji",
+                "摄入": "ueru",
+                "涉及": "ueji",
+                "毒蛇": "duue",
+                "是的": "uide",
+                "及时": "jiui",
+                "十个": "uige",
+                "测试": "ceui",
+                "历史": "liui",
+                "师傅": "uifu",
+                "实际": "uiji",
+                "故事": "guui",
+                "数据": "uuju",
+                "读书": "duuu",
+                "叔叔": "uuuu",
+                "法术": "fauu",
+                "树木": "uumu",
+                "竖起": "uuqi",
+                "输了": "uule",
+                "属于": "uuyu",
+                "舒服": "uufu",
+                "拘束": "juuu"
+        },
+
+            1: {
+                "变大": "bmda",
+                "路边": "lubm",
+                "鞭子": "bmzi",
+                "便利": "bmli",
+                "遍地": "bmdi",
+                "编辑": "bmji",
+                "卡片": "kapm",
+                "骗子": "pmzi",
+                "偏偏": "pmpm",
+                "面子": "mmzi",
+                "避免": "bimm",
+                "入眠": "rumm",
+                "勉励": "mmli",
+                "几点": "jidm",
+                "典礼": "dmli",
+                "电机": "dmji",
+                "气垫": "qidm",
+                "店铺": "dmpu",
+                "一天": "yitm",
+                "填词": "tmci",
+                "田野": "tmye",
+                "甜蜜": "tmmi",
+                "去年": "qunm",
+                "纪念": "jinm",
+                "迷恋": "milm",
+                "打脸": "dalm",
+                "联合": "lmhe",
+                "练字": "lmzi",
+                "大连": "dalm",
+                "减法": "jmfa",
+                "比肩": "bijm",
+                "意见": "yijm",
+                "附件": "fujm",
+                "笔尖": "bijm",
+                "福建": "fujm",
+                "拔剑": "bajm",
+                "渐渐": "jmjm",
+                "以前": "yiqm",
+                "千米": "qmmi",
+                "欠钱": "qmqm",
+                "牙签": "yaqm",
+                "仙气": "xmqi",
+                "路线": "luxm",
+                "显现": "xmxm",
+                "嫌弃": "xmqi",
+                "病情": "bkqk",
+                "平安": "pkan",
+                "姓名": "xkmk",
+                "预定": "yudk",
+                "倾听": "qktk",
+                "宁静": "nkjk",
+                "领地": "lkdi",
+                "精细": "jkxi",
+                "情绪": "qkxu",
+                "不行": "buxk",
+                "星星": "xkxk",
+                "硬币": "ykbi",
+                "班级": "bjji",
+                "半个": "bjge",
+                "办理": "bjli",
+                "打扮": "dabj",
+                "批判": "pipj",
+                "盘子": "pjzi",
+                "慢慢": "mjmj",
+                "满足": "mjzu",
+                "野蛮": "yemj",
+                "米饭": "mifj",
+                "反思": "fjsi",
+                "但凡": "djfj",
+                "孤单": "gudj",
+                "鸡蛋": "jidj",
+                "子弹": "zidj",
+                "弹力": "tjli",
+                "谈判": "tjpj",
+                "探测": "tjce",
+                "男子": "njzi",
+                "难题": "njti",
+                "河南": "henj",
+                "蓝色": "ljse",
+                "栏杆": "ljgj",
+                "感激": "gjji",
+                "看齐": "kjqi",
+                "刊物": "kjwu",
+                "含糊": "hjhu",
+                "大喊": "dahj",
+                "忽然": "hurj",
+                "赞叹": "zjtj",
+                "三个": "sjge",
+                "发散": "fasj",
+                "烟雾": "yjwu",
+                "研发": "yjfa",
+                "延误": "yjwu",
+                "贪玩": "tjwj",
+                "完了": "wjle",
+                "夜晚": "yewj"
+        },
+
+            2: {
+                "东西": "dsxi",
+                "普通": "puts",
+                "农业": "nsye",
+                "恐龙": "ksls",
+                "提供": "tigs",
+                "空隙": "ksxi",
+                "红色": "hsse",
+                "容易": "rsyi",
+                "总部": "zsbu",
+                "服从": "fucs",
+                "送礼": "ssli",
+                "勇气": "ysqi",
+                "包包": "bcbc",
+                "保护": "bchu",
+                "宝宝": "bcbc",
+                "爆发": "bcfa",
+                "跑步": "pcbu",
+                "泡泡": "pcpc",
+                "旗袍": "qipc",
+                "皮毛": "pimc",
+                "帽子": "mczi",
+                "刀法": "dcfa",
+                "道理": "dcli",
+                "到了": "dcle",
+                "倒地": "dcdi",
+                "淘气": "tcqi",
+                "逃避": "tcbi",
+                "大脑": "danc",
+                "打闹": "danc",
+                "老大": "lcda",
+                "捕捞": "bulc",
+                "牢固": "lcgu",
+                "疲劳": "pilc",
+                "高大": "gcda",
+                "告诉": "gcsu",
+                "可靠": "kekc",
+                "思考": "sikc",
+                "你好": "nihc",
+                "号码": "hcma",
+                "豪气": "hcqi",
+                "打扰": "darc",
+                "塑造": "suzc",
+                "早安": "zcan",
+                "洗澡": "xizc",
+                "草地": "ccdi",
+                "体操": "ticc",
+                "扫地": "scdi",
+                "骚扰": "scrc",
+                "不要": "buyc",
+                "撕咬": "siyc",
+                "妖魔": "ycmo",
+                "帮扶": "bhfu",
+                "棒子": "bhzi",
+                "胖子": "phzi",
+                "庞大": "phda",
+                "急忙": "jimh",
+                "莽夫": "mhfu",
+                "放弃": "fhqi",
+                "房子": "fhzi",
+                "防御": "fhyu",
+                "档案": "dhan",
+                "抵挡": "didh",
+                "唐突": "thtu",
+                "熬汤": "aoth",
+                "蜜糖": "mith",
+                "波浪": "bolh",
+                "女郎": "nvlh",
+                "狼藉": "lhji",
+                "刚需": "ghxu",
+                "钢丝": "ghsi",
+                "港剧": "ghju",
+                "抗体": "khti",
+                "安康": "ankh",
+                "启航": "qihh",
+                "行业": "hhye",
+                "让步": "rhbu",
+                "肮脏": "ahzh",
+                "仓库": "chku",
+                "桑拿": "shna",
+                "养育": "yhyu",
+                "样子": "yhzi",
+                "氧气": "yhqi",
+                "夕阳": "xiyh",
+                "网吧": "whba",
+                "往往": "whwh",
+                "忘了": "whle"
+        },
+
+            3: {
+                "崩塌": "bgta",
+                "碰壁": "pgbi",
+                "孟子": "mgzi",
+                "疯子": "fgzi",
+                "等级": "dgji",
+                "图腾": "tutg",
+                "能力": "ngli",
+                "冷气": "lgqi",
+                "土坑": "tukg",
+                "哼哈": "hgha",
+                "增速": "zgsu",
+                "层次": "cgci",
+                "僧侣": "sglv",
+                "富翁": "fuwg",
+                "白色": "bdse",
+                "拜拜": "bdbd",
+                "安排": "anpd",
+                "牌子": "pdzi",
+                "拍卖": "pdmd",
+                "派系": "pdxi",
+                "买课": "mdke",
+                "卖课": "mdke",
+                "埋没": "mdmo",
+                "大麦": "damd",
+                "代替": "ddti",
+                "彩带": "cddd",
+                "待遇": "ddyu",
+                "袋子": "ddzi",
+                "呆子": "ddzi",
+                "黛玉": "ddyu",
+                "太子": "tdzi",
+                "态度": "tddu",
+                "奶奶": "ndnd",
+                "奈何": "ndhe",
+                "来去": "ldqu",
+                "依赖": "yild",
+                "大概": "dagd",
+                "批改": "pigd",
+                "膝盖": "xigd",
+                "乞丐": "qigd",
+                "打开": "dakd",
+                "嗨哟": "hdyo",
+                "孩子": "hdzi",
+                "海鸥": "hdou",
+                "害我": "hdwo",
+                "在吗": "zdma",
+                "再来": "zdld",
+                "猜谜": "cdmi",
+                "财迷": "cdmi",
+                "才来": "cdld",
+                "彩色": "cdse",
+                "菜籽": "cdzi",
+                "器材": "qicd",
+                "塞子": "sdzi",
+                "比赛": "bisd",
+                "鱼鳃": "yusd",
+                "外八": "wdba",
+                "歪了": "wdle",
+                "不对": "budv",
+                "辞退": "citv",
+                "推拿": "tvna",
+                "富贵": "fugv",
+                "击溃": "jikv",
+                "不会": "buhv",
+                "锐利": "rvli",
+                "最大": "zvda",
+                "催促": "cvcu",
+                "破碎": "posv"
+        },
+
+            4: {
+                "根本": "gfbf",
+                "盆地": "pfdi",
+                "木门": "mumf",
+                "分析": "ffxi",
+                "嫩绿": "nflv",
+                "根据": "gfju",
+                "很大": "hfda",
+                "大人": "darf",
+                "怎么": "zfme",
+                "课文": "kewf",
+                "多余": "doyu",
+                "脱离": "toli",
+                "懦弱": "noro",
+                "逻辑": "loji",
+                "如果": "rugo",
+                "扩大": "koda",
+                "活力": "holi",
+                "弱点": "rodm",
+                "昨日": "zori",
+                "错误": "cowu",
+                "所以": "soyi",
+                "宾客": "bbke",
+                "拼音": "pbyb",
+                "民族": "mbzu",
+                "邻居": "lbju",
+                "如今": "rujb",
+                "侵入": "qbru",
+                "新的": "xbde",
+                "基因": "jiyb"
+        },
+
+            5: {
+                "表格": "bnge",
+                "表哥": "bnge",
+                "发飙": "fabn",
+                "票据": "pnju",
+                "漂泊": "pnbo",
+                "漂浮": "pnfu",
+                "喵喵": "mnmn",
+                "妙计": "mnji",
+                "去掉": "qudn",
+                "调取": "dnqu",
+                "调度": "dndu",
+                "拉尿": "lann",
+                "撒尿": "sann",
+                "小鸟": "xnnn",
+                "捕鸟": "bunn",
+                "无聊": "wuln",
+                "私聊": "siln",
+                "木料": "muln",
+                "资料": "ziln",
+                "塑料": "suln",
+                "饲料": "siln",
+                "医疗": "yiln",
+                "角度": "jndu",
+                "大叫": "dajn",
+                "提交": "tijn",
+                "搭桥": "daqn",
+                "敲打": "qnda",
+                "巧了": "qnle",
+                "大小": "daxn",
+                "小气": "xnqi",
+                "小马": "xnma",
+                "校服": "xnfu",
+                "母校": "muxn",
+                "大笑": "daxn",
+                "取笑": "quxn",
+                "可笑": "kexn",
+                "取消": "quxn",
+                "消极": "xnji",
+                "潇洒": "xnsa",
+                "剖析": "pzxi",
+                "计谋": "jimz",
+                "否则": "fzze",
+                "打斗": "dadz",
+                "偷偷": "tztz",
+                "遗漏": "yilz",
+                "足够": "zugz",
+                "可口": "kekz",
+                "以后": "yihz",
+                "骨肉": "gurz",
+                "走路": "zzlu",
+                "凑合": "czhe",
+                "搜集": "szji",
+                "有无": "yzwu",
+                "姑娘": "gunl",
+                "测量": "cell",
+                "热量": "rell",
+                "估量": "gull",
+                "两个": "llge",
+                "凄凉": "qill",
+                "凉席": "llxi",
+                "讲课": "jlke",
+                "即将": "jijl",
+                "奖励": "jlli",
+                "江西": "jlxi",
+                "降低": "jldi",
+                "强大": "qlda",
+                "强迫": "qlpo",
+                "墙壁": "qlbi",
+                "步枪": "buql",
+                "机枪": "jiql",
+                "想象": "xlxl",
+                "想起": "xlqi",
+                "香气": "xlqi",
+                "图像": "tuxl",
+                "相互": "xlhu",
+                "项目": "xlmu",
+                "箱子": "xlzi",
+                "大象": "daxl",
+                "象棋": "xlqi"
+        },
+
+            6: {
+                "隔断": "gedr",
+                "断句": "drju",
+                "异端": "yidr",
+                "端午": "drwu",
+                "段子": "drzi",
+                "短语": "dryu",
+                "短裤": "drku",
+                "团体": "trti",
+                "谜团": "mitr",
+                "集团": "jitr",
+                "暖气": "nrqi",
+                "取暖": "qunr",
+                "胡乱": "hulr",
+                "卵子": "lrzi",
+                "管理": "grli",
+                "关闭": "grbi",
+                "机关": "jigr",
+                "关于": "gryu",
+                "关系": "grxi",
+                "客观": "kegr",
+                "乐观": "legr",
+                "旅馆": "lvgr",
+                "罐子": "grzi",
+                "罚款": "fakr",
+                "宽度": "krdu",
+                "替换": "tihr",
+                "疲软": "pirr",
+                "计算": "jisr",
+                "丢弃": "dqqi",
+                "牛皮": "nqpi",
+                "牛马": "nqma",
+                "蜗牛": "wonq",
+                "按钮": "annq",
+                "河流": "helq",
+                "六个": "lqge",
+                "留意": "lqyi",
+                "拘留": "julq",
+                "依旧": "yijq",
+                "就业": "jqye",
+                "九个": "jqge",
+                "许久": "xujq",
+                "足球": "zuqq",
+                "打球": "daqq",
+                "地球": "diqq",
+                "气球": "qiqq",
+                "哀求": "aiqq",
+                "乞求": "qiqq",
+                "修理": "xqli",
+                "修补": "xqbu",
+                "秀气": "xqqi",
+                "休息": "xqxi",
+                "离别": "libp",
+                "撇捺": "ppna",
+                "熄灭": "ximp",
+                "蝴蝶": "hudp",
+                "补贴": "butp",
+                "拿捏": "nanp",
+                "破裂": "polp",
+                "节日": "jpri",
+                "而且": "erqp",
+                "谢谢": "xpxp"
+        },
+
+            7: {
+                "杯子": "bwzi",
+                "配偶": "pwou",
+                "没戏": "mwxi",
+                "起飞": "qifw",
+                "内科": "nwke",
+                "类似": "lwsi",
+                "给力": "gwli",
+                "黑色": "hwse",
+                "为了": "wwle",
+                "加入": "jxru",
+                "加密": "jxmi",
+                "加法": "jxfa",
+                "加固": "jxgu",
+                "加价": "jxjx",
+                "架子": "jxzi",
+                "家里": "jxli",
+                "家居": "jxju",
+                "假如": "jxru",
+                "假的": "jxde",
+                "假期": "jxqi",
+                "价格": "jxge",
+                "恰似": "qxsi",
+                "发卡": "faqx",
+                "下雨": "xxyu",
+                "下午": "xxwu",
+                "下去": "xxqu",
+                "阁下": "gexx",
+                "下棋": "xxqi",
+                "卷子": "jrzi",
+                "卷曲": "jrqu",
+                "募捐": "mujr",
+                "捐躯": "jrqu",
+                "全部": "qrbu",
+                "安全": "anqr",
+                "齐全": "qiqr",
+                "全局": "qrju",
+                "选择": "xrze",
+                "选举": "xrju",
+                "选拔": "xrba"
+        },
+
+            8: {
+                "钝器": "dyqi",
+                "吞吐": "tytu",
+                "理论": "lily",
+                "棍子": "gyzi",
+                "困了": "kyle",
+                "荤素": "hysu",
+                "滋润": "ziry",
+                "自尊": "zizy",
+                "寄存": "jicy",
+                "孙子": "syzi",
+                "君子": "jyzi",
+                "裙子": "qyzi",
+                "讯息": "xyxi",
+                "肆虐": "sint",
+                "忽略": "hult",
+                "策略": "celt",
+                "决绝": "jtjt",
+                "绝句": "jtju",
+                "拒绝": "jujt",
+                "杜绝": "dujt",
+                "麻雀": "maqt",
+                "缺乏": "qtfa",
+                "缺席": "qtxi",
+                "学习": "xtxi",
+                "科学": "kext",
+                "大学": "daxt",
+                "大雪": "daxt",
+                "靴子": "xtzi",
+                "光速": "glsu",
+                "旷野": "klye",
+                "黄色": "hlse"
+        },
+
+            9: {
+                "西瓜": "xigx",
+                "瓜子": "gxzi",
+                "苦瓜": "kugx",
+                "挂起": "gxqi",
+                "浮夸": "fukx",
+                "跨度": "kxdu",
+                "画画": "hxhx",
+                "画图": "hxtu",
+                "壁画": "bihx",
+                "怪物": "gkwu",
+                "快乐": "kkle",
+                "愉快": "yukk",
+                "快递": "kkdi",
+                "土块": "tukk",
+                "筷子": "kkzi",
+                "坏了": "hkle",
+                "破坏": "pohk",
+                "怀疑": "hkyi",
+                "窘迫": "jspo",
+                "无穷": "wuqs",
+                "穷苦": "qsku",
+                "胸部": "xsbu",
+                "熊大": "xsda",
+                "熊二": "xser",
+                "凶器": "xsqi",
+                "兄弟": "xsdi",
+                "雄起": "xsqi"
+            }
+        };
+
+        /**
+         * 小鹤双拼练习应用类
+         * 负责管理双拼练习的全部功能，包括章节选择、词汇显示、输入验证和统计
+         */
+        class ShuangpinPractice {
+            constructor() {
+                // 初始化应用状态
+                this.currentChapter = null;
+                this.currentWords = [];
+                this.currentIndex = 0;
+                this.correctCount = 0;
+                this.attemptCount = 0;
+                this.wordStatus = [];
+                this.showAnswer = false;
+                this.showKeyboard = false;
+                this.isMobile = this.detectMobile();
+                this.selectedChapters = []; // 存储选中的章节
+                
+                // 初始化应用
+                this.init();
+            }
+        
+            /**
+             * 初始化应用，绑定事件监听器
+             */
+            init() {
+                // 缓存DOM元素以提高性能
+                this.cacheDomElements();
+                // 绑定事件监听器
+                this.bindEvents();
+                // 适应移动设备
+                this.adaptToDevice();
+            }
+        
+            /**
+             * 缓存DOM元素，避免重复查询
+             */
+            cacheDomElements() {
+                this.elements = {
+                    chapterCards: document.querySelectorAll('.chapter-card'),
+                    chapterSelector: document.getElementById('chapterSelector'),
+                    practiceArea: document.getElementById('practiceArea'),
+                    realtimeInput: document.getElementById('realtimeInput'),
+                    currentWord: document.getElementById('currentWord'),
+                    answerDisplay: document.getElementById('answerDisplay'),
+                    message: document.getElementById('message'),
+                    accuracy: document.getElementById('accuracy'),
+                    keyboardLayout: document.getElementById('keyboardLayout'),
+                    backToChapters: document.getElementById('backToChapters'),
+                    answerToggle: document.getElementById('answerToggle'),
+                    keyboardToggle: document.getElementById('keyboardToggle')
+                };
+            }
+        
+            /**
+             * 检测是否为移动设备
+             * @returns {boolean} 是否为移动设备
+             */
+            detectMobile() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            }
+        
+            /**
+             * 根据设备类型调整界面
+             */
+            adaptToDevice() {
+                if (this.isMobile) {
+                    // 移动设备上默认显示虚拟键盘
+                    this.elements.keyboardToggle.click();
+                    // 禁用默认的下拉刷新行为
+                    document.addEventListener('touchmove', (e) => {
+                        if (window.scrollY === 0) e.preventDefault();
+                    }, { passive: false });
+                }
+            }
+        
+            /**
+             * 绑定所有DOM事件监听器
+             */
+            bindEvents() {
+                // 章节选择事件 - 添加触摸反馈
+                this.elements.chapterCards.forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const chapter = parseInt(e.currentTarget.dataset.chapter);
+                        if (chapter >= 0) { // 只处理有效的章节
+                            this.toggleChapterSelection(chapter);
+                        }
+                    });
+                    
+                    // 移动设备上的触摸反馈
+                    if (this.isMobile) {
+                        card.addEventListener('touchstart', () => {
+                            card.style.transform = 'scale(0.98)';
+                        });
+                        card.addEventListener('touchend', () => {
+                            card.style.transform = 'scale(1)';
+                        });
+                    }
+                });
+                
+                // 开始练习按钮事件
+                this.elements.startPractice = document.getElementById('startPractice');
+                this.elements.startPractice.addEventListener('click', () => this.startPractice());
+        
+                // 控制按钮事件
+                this.elements.backToChapters.addEventListener('click', () => this.backToChapters());
+                this.elements.answerToggle.addEventListener('click', () => this.toggleAnswer());
+                this.elements.keyboardToggle.addEventListener('click', () => this.toggleKeyboard());
+        
+                // 输入框事件
+                this.elements.realtimeInput.addEventListener('input', (e) => this.handleInput(e.target.value));
+                this.elements.realtimeInput.addEventListener('keydown', (e) => {
+                    // Enter键跳到下一个
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.nextWord();
+                    }
+                    // Tab键切换答案显示
+                    else if (e.key === 'Tab') {
+                        e.preventDefault();
+                        this.toggleAnswer();
+                    }
+                    // 空格键切换键盘显示
+                    else if (e.key === ' ') {
+                        e.preventDefault();
+                        this.toggleKeyboard();
+                    }
+                });
+                
+                // 点击空白处隐藏消息
+                document.addEventListener('click', (e) => {
+                    if (!this.elements.message.contains(e.target) && this.elements.message.style.display === 'block') {
+                        this.elements.message.style.display = 'none';
+                    }
+                });
+                
+                // 窗口大小变化时重新适配
+                window.addEventListener('resize', () => this.handleResize());
+            }
+        
+            /**
+             * 处理窗口大小变化
+             */
+            handleResize() {
+                // 重新检测设备类型
+                const wasMobile = this.isMobile;
+                this.isMobile = this.detectMobile();
+                
+                // 如果设备类型变化，重新适配
+                if (wasMobile !== this.isMobile) {
+                    this.adaptToDevice();
+                }
+            }
+        
+            /**
+             * 选择并加载指定章节的词汇
+             * @param {number} chapterIndex - 章节索引
+             */
+            selectChapter(chapterIndex) {
+                // 验证章节索引
+                if (chapterIndex < 0 || chapterIndex >= 10) {
+                    this.showMessage('章节索引无效', 'error');
+                    return;
+                }
+                
+                this.currentChapter = chapterIndex;
+                this.currentWords = Object.keys(SHUANGPIN_DATA[chapterIndex] || {});
+                
+                if (this.currentWords.length === 0) {
+                    this.showMessage('该章节暂无词汇', 'error');
+                    return;
+                }
+        
+                // 使用Fisher-Yates算法进行更公平的随机排序
+                this.currentWords = this.fisherYatesShuffle([...this.currentWords]);
+        
+                // 重置状态并显示练习界面
+                this.resetStats();
+                this.showPracticeArea();
+                this.displayCurrentWord();
+                this.updateStats();
+                
+                // 确保输入框获得焦点
+                setTimeout(() => this.elements.realtimeInput.focus(), 100);
+            }
+            
+            /**
+             * 切换章节的选中状态
+             * @param {number} chapterIndex - 章节索引
+             */
+            toggleChapterSelection(chapterIndex) {
+                const index = this.selectedChapters.indexOf(chapterIndex);
+                const card = this.elements.chapterCards[Array.from(this.elements.chapterCards).findIndex(c => parseInt(c.dataset.chapter) === chapterIndex)];
+                
+                if (index === -1) {
+                    // 选中章节
+                    this.selectedChapters.push(chapterIndex);
+                    card.classList.add('selected');
+                } else {
+                    // 取消选中
+                    this.selectedChapters.splice(index, 1);
+                    card.classList.remove('selected');
+                }
+                
+                // 更新开始练习按钮状态
+                this.updateStartButtonState();
+            }
+            
+            /**
+             * 更新开始练习按钮状态
+             */
+            updateStartButtonState() {
+                if (this.selectedChapters.length > 0) {
+                    this.elements.startPractice.disabled = false;
+                } else {
+                    this.elements.startPractice.disabled = true;
+                }
+            }
+            
+            /**
+             * 开始练习选中的章节
+             */
+            startPractice() {
+                if (this.selectedChapters.length === 0) {
+                    this.showMessage('请至少选择一个章节', 'error');
+                    return;
+                }
+                
+                // 合并选中章节的词汇
+                this.currentWords = [];
+                this.selectedChapters.forEach(chapter => {
+                    const words = Object.keys(SHUANGPIN_DATA[chapter] || {});
+                    this.currentWords = [...this.currentWords, ...words];
+                });
+                
+                if (this.currentWords.length === 0) {
+                    this.showMessage('选中的章节暂无词汇', 'error');
+                    return;
+                }
+                
+                // 使用Fisher-Yates算法进行更公平的随机排序
+                this.currentWords = this.fisherYatesShuffle([...this.currentWords]);
+                
+                // 重置状态并显示练习界面
+                this.resetStats();
+                this.showPracticeArea();
+                this.displayCurrentWord();
+                this.updateStats();
+                
+                // 确保输入框获得焦点
+                setTimeout(() => this.elements.realtimeInput.focus(), 100);
+            }
+        
+            /**
+             * Fisher-Yates洗牌算法，生成更公平的随机排列
+             * @param {Array} array - 需要打乱的数组
+             * @returns {Array} 打乱后的数组
+             */
+            fisherYatesShuffle(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            }
+        
+            /**
+             * 重置统计数据
+             */
+            resetStats() {
+                this.currentIndex = 0;
+                this.correctCount = 0;
+                this.attemptCount = 0;
+                this.wordStatus = Array(this.currentWords.length).fill(false);
+            }
+        
+            /**
+             * 显示练习区域，隐藏章节选择区域
+             */
+            showPracticeArea() {
+                this.elements.chapterSelector.style.display = 'none';
+                this.elements.practiceArea.style.display = 'block';
+            }
+        
+            /**
+             * 显示当前词汇及其相关信息
+             */
+            displayCurrentWord() {
+                if (this.currentIndex >= this.currentWords.length) {
+                    this.showCompletion();
+                    return;
+                }
+        
+                const word = this.currentWords[this.currentIndex];
+                this.elements.currentWord.textContent = word;
+                this.elements.realtimeInput.value = '';
+                
+                // 重置输入框样式和微交互
+                const input = this.elements.realtimeInput;
+                input.classList.remove('correct', 'incorrect');
+                input.style.transition = 'all 0.2s ease';
+                
+                // 根据设置决定是否显示答案
+                if (this.showAnswer) {
+                    const converted = this.getWordShuangpin(word);
+                    this.elements.answerDisplay.textContent = converted;
+                    this.elements.answerDisplay.classList.remove('hidden');
+                } else {
+                    this.elements.answerDisplay.classList.add('hidden');
+                }
+                
+                // 添加词汇切换的动画效果
+                this.elements.currentWord.style.opacity = '0.5';
+                setTimeout(() => {
+                    this.elements.currentWord.style.opacity = '1';
+                }, 100);
+            }
+        
+            /**
+             * 获取词汇的双拼编码
+             * @param {string} word - 要查询的词汇
+             * @returns {string} 双拼编码
+             */
+            getWordShuangpin(word) {
+                // 如果是多选模式，遍历所有选中的章节查找词汇
+                if (this.selectedChapters && this.selectedChapters.length > 0) {
+                    for (let i = 0; i < this.selectedChapters.length; i++) {
+                        const chapter = this.selectedChapters[i];
+                        if (SHUANGPIN_DATA[chapter] && SHUANGPIN_DATA[chapter][word]) {
+                            return SHUANGPIN_DATA[chapter][word];
+                        }
+                    }
+                }
+                // 否则使用单个章节模式
+                return SHUANGPIN_DATA[this.currentChapter]?.[word] || '';
+            }
+        
+            /**
+             * 处理用户输入，验证输入是否正确
+             * @param {string} value - 用户输入的内容
+             */
+            handleInput(value) {
+                const word = this.currentWords[this.currentIndex];
+                const converted = this.getWordShuangpin(word);
+                
+                const input = this.elements.realtimeInput;
+                const lowerValue = value.toLowerCase();
+                const lowerConverted = converted.toLowerCase();
+                
+                // 空输入时清除样式
+                if (value.length === 0) {
+                    input.classList.remove('correct', 'incorrect');
+                    return;
+                }
+                
+                // 逐字母验证：检查用户输入的前n位是否与答案的前n位匹配
+                const userPrefix = lowerValue;
+                const correctPrefix = lowerConverted.substring(0, value.length);
+                
+                // 完全匹配答案（4位全部正确）
+                if (value.length === 4) {
+                    this.attemptCount++;
+                    
+                    if (lowerValue === lowerConverted) {
+                        input.classList.add('correct');
+                        input.classList.remove('incorrect');
+                        
+                        // 添加微交互效果
+                        input.style.transform = 'scale(1.05)';
+                        setTimeout(() => {
+                            input.style.transform = 'scale(1)';
+                        }, 200);
+                        
+                        // 只统计首次正确的情况
+                        if (!this.wordStatus[this.currentIndex]) {
+                            this.correctCount++;
+                            this.wordStatus[this.currentIndex] = true;
+                        }
+                        
+                        // 短暂延迟后自动进入下一个词汇
+                        setTimeout(() => this.nextWord(), 300);
+                    } else {
+                        input.classList.add('incorrect');
+                        input.classList.remove('correct');
+                        
+                        // 添加错误反馈动画
+                        input.style.transform = 'translateX(-2px)';
+                        setTimeout(() => {
+                            input.style.transform = 'translateX(2px)';
+                        }, 50);
+                        setTimeout(() => {
+                            input.style.transform = 'translateX(0)';
+                        }, 100);
+                    }
+                    
+                    this.updateStats();
+                }
+                // 前缀匹配：输入的前n位与答案的前n位完全一致
+                else if (userPrefix === correctPrefix) {
+                    input.classList.remove('incorrect');
+                    // 不添加任何样式，保持默认
+                }
+                // 任何位置不匹配：显示错误
+                else {
+                    input.classList.add('incorrect');
+                    input.classList.remove('correct');
+                }
+            }
+        
+            /**
+             * 跳转到下一个词汇
+             */
+            nextWord() {
+                this.currentIndex++;
+                if (this.currentIndex >= this.currentWords.length) {
+                    this.showCompletion();
+                } else {
+                    this.displayCurrentWord();
+                }
+                // 确保输入框获得焦点
+                setTimeout(() => this.elements.realtimeInput.focus(), 100);
+            }
+        
+            /**
+             * 显示章节完成信息
+             */
+            showCompletion() {
+                // 计算正确率，确保不会超过100%
+                const accuracy = this.attemptCount > 0 
+                    ? Math.min(Math.round((this.correctCount / this.attemptCount) * 100), 100) 
+                    : 0;
+                
+                this.showMessage(`
+                    <h3>章节完成！</h3>
+                    <p>总词汇：${this.currentWords.length} 个</p>
+                    <p>正确回答：${this.correctCount} 个</p>
+                    <p>尝试次数：${this.attemptCount} 次</p>
+                    <p>正确率：${accuracy}%</p>
+                    <button onclick="app.backToChapters()" class="control-button" style="margin-top: 10px;">返回章节</button>
+                `, 'success');
+            }
+        
+            /**
+             * 返回章节选择界面
+             */
+            backToChapters() {
+                this.elements.chapterSelector.style.display = 'grid';
+                this.elements.practiceArea.style.display = 'none';
+                this.currentChapter = null;
+                this.currentWords = [];
+                this.selectedChapters = []; // 清空选中的章节
+                this.resetStats();
+                
+                // 重置章节卡片选中状态
+                this.elements.chapterCards.forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // 更新开始练习按钮状态
+                this.updateStartButtonState();
+                
+                // 隐藏消息和键盘
+                this.elements.message.style.display = 'none';
+                if (this.showKeyboard) {
+                    this.toggleKeyboard();
+                }
+            }
+        
+            /**
+             * 切换答案显示状态
+             */
+            toggleAnswer() {
+                this.showAnswer = !this.showAnswer;
+                const btn = this.elements.answerToggle;
+                
+                if (this.showAnswer) {
+                    btn.classList.add('active');
+                    btn.textContent = '隐藏答案';
+                    // 添加过渡动画
+                    this.elements.answerDisplay.style.transition = 'opacity 0.3s ease';
+                    this.elements.answerDisplay.style.opacity = '0';
+                    setTimeout(() => {
+                        if (this.currentWords[this.currentIndex]) {
+                            this.elements.answerDisplay.textContent = this.getWordShuangpin(this.currentWords[this.currentIndex]);
+                        }
+                        this.elements.answerDisplay.classList.remove('hidden');
+                        this.elements.answerDisplay.style.opacity = '1';
+                    }, 100);
+                } else {
+                    btn.classList.remove('active');
+                    btn.textContent = '显示答案';
+                    // 添加过渡动画
+                    this.elements.answerDisplay.style.opacity = '0';
+                    setTimeout(() => {
+                        this.elements.answerDisplay.classList.add('hidden');
+                    }, 300);
+                }
+            }
+        
+            /**
+             * 切换键盘布局显示状态
+             */
+            toggleKeyboard() {
+                this.showKeyboard = !this.showKeyboard;
+                const btn = this.elements.keyboardToggle;
+                const keyboard = this.elements.keyboardLayout;
+                
+                // 添加过渡动画
+                keyboard.style.transition = 'max-height 0.3s ease, opacity 0.3s ease';
+                
+                if (this.showKeyboard) {
+                    btn.classList.add('active');
+                    btn.textContent = '隐藏键盘';
+                    keyboard.classList.add('show');
+                    keyboard.style.maxHeight = '500px';
+                    keyboard.style.opacity = '1';
+                } else {
+                    btn.classList.remove('active');
+                    btn.textContent = '显示键盘';
+                    keyboard.style.maxHeight = '0';
+                    keyboard.style.opacity = '0';
+                    setTimeout(() => {
+                        keyboard.classList.remove('show');
+                    }, 300);
+                }
+            }
+        
+            /**
+             * 更新统计信息显示
+             */
+            updateStats() {
+                // 计算正确率，确保不会超过100%
+                const accuracy = this.attemptCount > 0 
+                    ? Math.min(Math.round((this.correctCount / this.attemptCount) * 100), 100) 
+                    : 0;
+                
+                // 添加数字变化动画
+                const oldAccuracy = parseInt(this.elements.accuracy.textContent) || 0;
+                const accuracyEl = this.elements.accuracy;
+                
+                if (oldAccuracy !== accuracy) {
+                    accuracyEl.style.transition = 'transform 0.3s ease';
+                    accuracyEl.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        accuracyEl.textContent = `${accuracy}%`;
+                        accuracyEl.style.transform = 'scale(1)';
+                    }, 150);
+                } else {
+                    accuracyEl.textContent = `${accuracy}%`;
+                }
+            }
+        
+            /**
+             * 显示消息提示
+             * @param {string} text - 消息内容
+             * @param {string} type - 消息类型（success/error）
+             */
+            showMessage(text, type) {
+                const messageEl = this.elements.message;
+                
+                // 添加过渡动画
+                messageEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                messageEl.style.opacity = '0';
+                messageEl.style.transform = 'translateY(-10px)';
+                
+                // 设置消息内容和类型
+                messageEl.innerHTML = text;
+                messageEl.className = `message ${type}`;
+                messageEl.style.display = 'block';
+                
+                // 触发动画
+                setTimeout(() => {
+                    messageEl.style.opacity = '1';
+                    messageEl.style.transform = 'translateY(0)';
+                }, 10);
+                
+                // 成功消息5秒后自动隐藏
+                if (type === 'success') {
+                    setTimeout(() => {
+                        messageEl.style.opacity = '0';
+                        messageEl.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            messageEl.style.display = 'none';
+                        }, 300);
+                    }, 5000);
+                }
+            }
+        }
+        
+        // 初始化应用 - 确保DOM加载完成后再创建实例
+        document.addEventListener('DOMContentLoaded', function() {
+            const app = new ShuangpinPractice();
+            // 暴露app对象给全局，便于调试和测试
+            window.app = app;
+        });
+    </script>
+</body>
+</html>
