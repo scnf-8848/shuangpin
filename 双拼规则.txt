@@ -2,6 +2,7 @@ zh v
 ch i
 sh u
 üan r
+van r
 uang l
 uan r
 uai k
@@ -17,11 +18,14 @@ ing k
 eng g
 ang h
 ün y
+vn y
 un y
 in b
 en f
 an j
 üe t
+ue t
+ve t
 ie p
 iu q
 ou z
